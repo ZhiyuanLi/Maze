@@ -1,5 +1,12 @@
 package maze;
 
+/**
+ * Contains the maze struture, which is just an array of <code>MazeCell</code>s.
+ * Also contains the algorithms for generating and solving the maze.
+ *
+ * @author Zhiyuan Li
+ * @author Di Wu
+ */
 import java.util.*;
 
 /**

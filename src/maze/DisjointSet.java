@@ -1,5 +1,12 @@
 package maze;
 
+/**
+ * Disjoint Set class
+ * 
+ * @author Zhiyuan Li
+ * @author Di Wu
+ *
+ */
 public class DisjointSet {
 
 	// TODO - write all the methods of this class

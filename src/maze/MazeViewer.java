@@ -9,9 +9,6 @@ import java.util.Random;
 /**
  * Visualization panel for the maze. Contains the driver for calling various
  * maze solving and maze formation algorithms.
- * 
- * @author Zhiyuan Li
- * @author Di Wu
  */
 public class MazeViewer extends JPanel {
 

@@ -14,8 +14,7 @@ import java.util.Random;
  * <code>neighborW</code>. If any of these values are null, it means this cell
  * is on the border of the maze.
  *
- * @author Zhiyuan Li
- * @author Di Wu
+ *
  */
 public class MazeCell {
 

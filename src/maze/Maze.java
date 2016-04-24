@@ -1,172 +1,194 @@
 package maze;
 
-
 import java.util.*;
 
 /**
- *  Contains the maze struture, which is just an array of 
- *  <code>MazeCell</code>s.  Also contains the algorithms
- *  for generating and solving the maze.
+ * Contains the maze struture, which is just an array of <code>MazeCell</code>s.
+ * Also contains the algorithms for generating and solving the maze.
  *
  */
 public class Maze {
 
 	private int rows, cols;
 	private MazeCell maze[][];
-	//the UI code is all in MazeViewer.java
+	// the UI code is all in MazeViewer.java
 	private MazeViewer viewer;
-	//This is just for random number generation
+	// This is just for random number generation
 	private Random generator;
 	private MazeCell startCell;
 	private MazeCell endCell;
 
-	private DisjointSet disjointSet = new DisjointSet();
+	private DisjointSet disjointSet;
 
 	/**
-	 *  Creates a maze that has the given number of rows and columns.
-	 *  Sets the neighbors of each cell.
-	 *  @param rows  Number of rows in the maze.
-	 *  @param cols  Number of columns in the maze.
+	 * Creates a maze that has the given number of rows and columns. Sets the
+	 * neighbors of each cell.
+	 * 
+	 * @param rows
+	 *            Number of rows in the maze.
+	 * @param cols
+	 *            Number of columns in the maze.
 	 */
 	public Maze(int rows, int cols) {
 		this.rows = rows;
 		this.cols = cols;
 		generator = new Random();
+		disjointSet = new DisjointSet();
 
-		// Create the maze.     
+		// Create the maze.
 		maze = new MazeCell[rows][cols];
-		for (int i=0; i<rows; i++) {
-			for (int j=0; j<cols; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
 				maze[i][j] = new MazeCell();
 				maze[i][j].setPosition(i, j);
 			}
 		}
 
 		// Set the neighbors for each cell in the maze.
-		for (int i=0; i<rows; i++) {
-			for (int j=0; j<cols; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
 				MazeCell n, e, s, w;
-				if (i == 0) n = null; // On north border of maze
-				else n = maze[i-1][j]; 
+				if (i == 0)
+					n = null; // On north border of maze
+				else
+					n = maze[i - 1][j];
 
-				if (i == rows-1) s = null; // On south border of maze
-				else s = maze[i+1][j];
+				if (i == rows - 1)
+					s = null; // On south border of maze
+				else
+					s = maze[i + 1][j];
 
-				if (j == 0) w = null; // On west border of maze
-				else w = maze[i][j-1];
+				if (j == 0)
+					w = null; // On west border of maze
+				else
+					w = maze[i][j - 1];
 
-				if (j == cols-1) e = null; // On east border of maze
-				else e = maze[i][j+1];
+				if (j == cols - 1)
+					e = null; // On east border of maze
+				else
+					e = maze[i][j + 1];
 
-				maze[i][j].setNeighbors(n,e,s,w);
+				maze[i][j].setNeighbors(n, e, s, w);
 			}
 		}
 	}
 
-
 	/**
-	 *  Accessor that sets the <code>MazeViewer</code> variable for
-	 *  the maze.  When the viewer is not set, no visualization takes place.
-	 *  @param viewer Visual display place for the maze.
+	 * Accessor that sets the <code>MazeViewer</code> variable for the maze.
+	 * When the viewer is not set, no visualization takes place.
+	 * 
+	 * @param viewer
+	 *            Visual display place for the maze.
 	 */
 	public void setViewer(MazeViewer viewer) {
 		this.viewer = viewer;
 	}
 
 	/**
-	 *  Accessor that sets the start cell for the maze.
-	 *  @param cell Start cell for the maze.
+	 * Accessor that sets the start cell for the maze.
+	 * 
+	 * @param cell
+	 *            Start cell for the maze.
 	 */
 	public void setStartCell(MazeCell cell) {
 		startCell = cell;
 	}
 
 	/**
-	 *  Accessor that sets the end cell for the maze.
-	 *  @param cell End cell for the maze.
+	 * Accessor that sets the end cell for the maze.
+	 * 
+	 * @param cell
+	 *            End cell for the maze.
 	 */
 	public void setEndCell(MazeCell cell) {
 		endCell = cell;
 	}
 
 	/**
-	 *  Accessor that returns the start cell for the maze.
-	 *  @return Start cell for the maze.
+	 * Accessor that returns the start cell for the maze.
+	 * 
+	 * @return Start cell for the maze.
 	 */
 	public MazeCell getStartCell() {
 		return startCell;
 	}
 
 	/**
-	 *  Accessor that returns the end cell for the maze.
-	 *  @return End cell for the maze.
+	 * Accessor that returns the end cell for the maze.
+	 * 
+	 * @return End cell for the maze.
 	 */
 	public MazeCell getEndCell() {
 		return endCell;
 	}
 
 	/**
-	 *  Accessor that returns the number of rows in the maze.
-	 *  @return The number of rows in the maze.
+	 * Accessor that returns the number of rows in the maze.
+	 * 
+	 * @return The number of rows in the maze.
 	 */
 	public int getRows() {
 		return rows;
 	}
 
 	/**
-	 *  Accessor that returns the number of columns in the maze.
-	 *  @return The number of columns in the maze.
+	 * Accessor that returns the number of columns in the maze.
+	 * 
+	 * @return The number of columns in the maze.
 	 */
 	public int getCols() {
 		return cols;
 	}
 
 	/**
-	 *  Returns the cell in the maze at the given coordinates.
-	 *  @param row  The row in the maze of the cell.
-	 *  @param col  The column in the maze of the cell.
-	 *  @return  The cell at (<code>row</code>, <code>col</code>)
+	 * Returns the cell in the maze at the given coordinates.
+	 * 
+	 * @param row
+	 *            The row in the maze of the cell.
+	 * @param col
+	 *            The column in the maze of the cell.
+	 * @return The cell at (<code>row</code>, <code>col</code>)
 	 */
 	public MazeCell getCell(int row, int col) {
 		return maze[row][col];
 	}
 
 	/**
-	 *  Tells the viewer to show the maze again, with 
-	 *  any changes to cells updated.  The current cell 
-	 *  will be colored in the viewer.  If the viewer is null,
-	 *  this method does nothing.
-	 *  @param cell Current cell, that the viewer will color.
+	 * Tells the viewer to show the maze again, with any changes to cells
+	 * updated. The current cell will be colored in the viewer. If the viewer is
+	 * null, this method does nothing.
+	 * 
+	 * @param cell
+	 *            Current cell, that the viewer will color.
 	 */
 	public synchronized void visualize(MazeCell cell) {
-		//TODO - call the appropriate method from MazeViewer to visualize
+		// TODO - call the appropriate method from MazeViewer to visualize
 		viewer.visualize(cell);
 	}
 
 	/**
-	 *  Generates the maze. 
-	 *  The maze is generated by Kruskal's algorithm
+	 * Generates the maze. The maze is generated by Kruskal's algorithm
 	 */
 	public synchronized void generateMaze() {
 		makeKruskalMaze();
-		//you can change the startCell and endCell values
-		startCell = maze[rows-5][cols-1];
-		endCell = maze[rows-1][cols-1];
+		// you can change the startCell and endCell values
+		startCell = maze[rows - 5][cols - 1];
+		endCell = maze[rows - 1][cols - 1];
 	}
 
 	/**
-	 *  Forms the maze via Kruskal's algorithm.
+	 * Forms the maze via Kruskal's algorithm.
 	 */
 	public synchronized void makeKruskalMaze() {
-		//TODO - use a modified version of Kruskal's algorithm to make the maze
+		// TODO - use a modified version of Kruskal's algorithm to make the maze
 		int wallsDown = 0;
 		int totalCell = rows * cols;
 		// create disjointSet
 		disjointSet.makeSet(maze);
 		while (wallsDown < totalCell - 1) {
-			//			System.out.println("round: " + wallsDown);
+			// System.out.println("round: " + wallsDown);
 			MazeCell current = getCell(generator.nextInt(rows), generator.nextInt(cols));
-			MazeCell next = current.neighborWithWalls();
+			MazeCell next = current.neighborWithOneWallBetween();
 			if (next != null) {
 				MazeCell rootC = disjointSet.find(current);
 				MazeCell rootN = disjointSet.find(next);
@@ -179,14 +201,13 @@ public class Maze {
 		}
 	}
 
-
 	/**
-	 *  Solve maze.  The input parameter is guaranteed
-	 *  to be one of "dfs", "bfs",  or "random".
-	 *  @param method The method for solving the maze; one of
-	 *                "dfs" = depth first search, 
-	 *                "bfs" = breadth first search, 
-	 *                "random" = random walk.
+	 * Solve maze. The input parameter is guaranteed to be one of "dfs", "bfs",
+	 * or "random".
+	 * 
+	 * @param method
+	 *            The method for solving the maze; one of "dfs" = depth first
+	 *            search, "bfs" = breadth first search, "random" = random walk.
 	 */
 	public synchronized void solveMaze(String method) {
 		if (method.equals("random")) {
@@ -199,28 +220,27 @@ public class Maze {
 	}
 
 	/**
-	 *  Solves the maze by randomly choosing a neighboring
-	 *  cell to explore. This method has been written for you.
-	 *  Please note this method takes a very long time
-	 *  to complete.
+	 * Solves the maze by randomly choosing a neighboring cell to explore. This
+	 * method has been written for you. Please note this method takes a very
+	 * long time to complete.
 	 */
 	public synchronized void solveRandomMaze() {
 		// Start the search at the start cell
 		MazeCell current = startCell;
 
 		// while we haven't reached the end of the maze
-		while(current != endCell) { 
+		while (current != endCell) {
 			visualize(current); // show the progress visually (repaint)
 			MazeCell neighbors[] = current.getNeighbors();
 			int index = generator.nextInt(neighbors.length);
 			current.examine();
-			current = neighbors[index];    
+			current = neighbors[index];
 		}
 		visualize(current);
 	}
 
 	/**
-	 *  Solves the maze by depth first search.
+	 * Solves the maze by depth first search.
 	 */
 	public synchronized void solveDFSMaze() {
 		// Start the search at the start cell
@@ -232,25 +252,25 @@ public class Maze {
 		while (!stack.isEmpty()) {
 			current = stack.pop();
 			visualize(current);
-			current.visit();
 			if (!current.equals(endCell)) {
-				MazeCell neibors[] = current.getNeighbors();
-				for (int i = 0; i < neibors.length; i++) {
-					if (!neibors[i].visited()) {
-						stack.push(neibors[i]);
+				MazeCell neighbors[] = current.getNeighbors();
+				for (int i = 0; i < neighbors.length; i++) {
+					if (!neighbors[i].examined() && !neighbors[i].visited()) {
+						stack.push(neighbors[i]);
+						neighbors[i].visit();
 					}
 				}
 			} else {
 				break;
 			}
-		}	
+			current.examine();
+		}
 		visualize(current);
 	}
 
 	/**
-	 *  Solves the maze by breadth first search.
-	 *  starts at the start vertex and stops when bfs
-	 *  discovers the end vertex
+	 * Solves the maze by breadth first search. starts at the start vertex and
+	 * stops when bfs discovers the end vertex
 	 */
 	public synchronized void solveBFSMaze() {
 		// Start the search at the start cell
@@ -266,20 +286,19 @@ public class Maze {
 			current = queue.poll();
 			if (!current.equals(endCell)) {
 
-				MazeCell[] neibors = current.getNeighbors();
-				for (int i = 0; i< neibors.length; i++) {
-					if (!neibors[i].visited()) {
-						queue.add(neibors[i]);
-						neibors[i].visit();
+				MazeCell[] neighbors = current.getNeighbors();
+				for (int i = 0; i < neighbors.length; i++) {
+					if (!neighbors[i].examined() && !neighbors[i].visited()) {
+						queue.add(neighbors[i]);
+						neighbors[i].visit();
 					}
 				}
 				current.examine();
 			} else {
 				break;
 			}
-		}	
+		}
 		visualize(current);
 	}
-
 
 }
